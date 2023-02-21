@@ -1,27 +1,25 @@
-import React, {useState} from 'react';
-
+import React, { useState } from 'react';
 import MoviesList from './components/MoviesList';
 import './App.css';
 
 function App() {
   const [movies, setMovies] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  async function fetchMoviesHandler(){
-    try {
-      const response = await fetch('https://swapi.dev/api/films');
-      const data = await response.json();
-      const transformedMovies = data.results.map(movieData =>{
-        return {
-          id:movieData.episode_id,
-          title:movieData.title,
-          openingText:movieData.opening_crawl,
-          releaseDate:movieData.release_data
-        }
-      })
-      setMovies(transformedMovies);
-    } catch (error) {
-      console.error(error);
-    }
+  async function fetchMoviesHandler() {
+    setIsLoading(true); // set isLoading to true before fetching data
+    const response = await fetch('https://swapi.dev/api/films');
+    const data = await response.json();
+    const transformedMovies = data.results.map((movieData) => {
+      return {
+        id: movieData.episode_id,
+        title: movieData.title,
+        openingText: movieData.opening_crawl,
+        releaseDate: movieData.release_data,
+      };
+    });
+    setMovies(transformedMovies);
+    setIsLoading(false); // set isLoading to false after data is loaded
   }
 
   return (
@@ -30,7 +28,12 @@ function App() {
         <button onClick={fetchMoviesHandler}>Fetch Movies</button>
       </section>
       <section>
-        <MoviesList movies={movies} />
+        {/* conditionally render loader */}
+        {isLoading ? (
+          <p>Loading...</p>
+        ) : (
+          <MoviesList movies={movies} />
+        )}
       </section>
     </React.Fragment>
   );
